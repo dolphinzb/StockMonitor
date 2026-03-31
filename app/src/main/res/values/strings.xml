@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">StockMonitor</string>
+    <string name="stock_placeholder">股票代码</string>
+    <string name="price_label">价格</string>
+    <string name="change_label">涨跌</string>
+    <string name="refresh_label">刷新</string>
+    <string name="settings_label">设置</string>
+</resources>
