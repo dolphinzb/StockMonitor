@@ -7,6 +7,7 @@ local.properties
 
 # Log/OS Files
 *.log
+logcat.txt
 
 # Android Studio generated files and folders
 captures/
@@ -38,3 +39,4 @@ google-services.json
 
 # specify the files to be ignored
 .specify/
+specs/

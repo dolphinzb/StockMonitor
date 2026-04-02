@@ -1,21 +1,21 @@
 package com.stockmonitor.data.remote
 
-import com.stockmonitor.data.remote.dto.StockResponse
 import retrofit2.http.GET
-import retrofit2.http.Query
+import retrofit2.http.Url
 
 /**
  * 股票 API 服务接口
- * 定义股票数据获取的网络请求
+ * 新浪财经 API: https://hq.sinajs.cn/list=sh600519,sz000001
+ * 返回格式: var hq_str_sh600519="name,price,change,percent,open,yesterdayClose,high,low,volume,amount,time,date";
  */
 interface StockApiService {
-    /**
-     * 获取股票数据
-     * @param codes 股票代码列表，多个代码用逗号分隔
-     * @return 股票响应数据
-     */
-    @GET("api/stock")
+    @GET
     suspend fun getStockData(
-        @Query("codes") codes: String
-    ): StockResponse
+        @Url codes: String
+    ): String
+
+    @GET
+    suspend fun getStockDataList(
+        @Url codes: String
+    ): String
 }

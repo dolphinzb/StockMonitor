@@ -19,3 +19,18 @@ data class StockData(
     val changePercent: Double,
     val updateTime: Long
 )
+
+/**
+ * 股票价格刷新结果
+ *
+ * @param successCount 成功获取价格的股票数量
+ * @param failedCodes 失败股票代码列表
+ * @param totalRequested 请求的股票总数
+ * @param stockDataList 成功获取的股票数据列表
+ */
+data class RefreshResult(
+    val successCount: Int,
+    val failedCodes: List<String>,
+    val totalRequested: Int,
+    val stockDataList: List<StockData>
+)
