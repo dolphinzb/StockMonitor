@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<lint>
+    <!-- 启用所有默认检查 -->
+    <issue id="All" severity="enabled" />
+
+    <!-- Android Kotlin 特定规则 -->
+    <issue id="AndroidKt" severity="enabled" />
+    <issue id="AndroidFrameworkInspection" severity="enabled" />
+
+    <!-- 中文注释检查 (自定义规则) -->
+    <!-- 要求公共类和方法必须有 Javadoc 注释 -->
+    <issue id="Javadoc" severity="warning" />
+    <issue id="MissingJavadoc" severity="warning" />
+
+    <!-- 代码安全检查 -->
+    <issue id="HardcodedText" severity="disabled" />
+    <issue id="UnsafeNativeCode" severity="enabled" />
+
+    <!-- 性能检查 -->
+    <issue id="UseCompoundDrawables" severity="enabled" />
+    <issue id="StringFormatCount" severity="enabled" />
+
+    <!-- 安全性检查 -->
+    <issue id="AllowBackup" severity="enabled" />
+    <issue id="GoogleAppIndexingWarning" severity="disabled" />
+
+    <!-- 忽略特定文件的检查 -->
+    <ignore path="**/build/**" />
+    <ignore path="**/gen/**" />
+    <ignore path="**/.gradle/**" />
+    <ignore path="**/proguard-rules.pro" />
+
+    <!-- 特定问题的严重级别 -->
+    <issue id="Typos" severity="warning" />
+    <issue id="Spelling" severity="warning" />
+</lint>

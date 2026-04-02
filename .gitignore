@@ -7,6 +7,7 @@ local.properties
 
 # Log/OS Files
 *.log
+logcat.txt
 
 # Android Studio generated files and folders
 captures/
@@ -32,3 +33,10 @@ google-services.json
 
 # Android Profiling
 *.hprof
+
+# trae
+.trae/
+
+# specify the files to be ignored
+.specify/
+specs/
