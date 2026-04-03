@@ -2,16 +2,19 @@ package com.stockmonitor.di
 
 import android.content.Context
 import androidx.room.Room
+import com.stockmonitor.data.local.SettingsDao
 import com.stockmonitor.data.local.StockDao
 import com.stockmonitor.data.local.StockDatabase
 import com.stockmonitor.data.local.StockDataDao
 import com.stockmonitor.data.local.StockAlertDao
 import com.stockmonitor.data.remote.StockApiService
+import com.stockmonitor.data.repository.SettingsRepositoryImpl
 import com.stockmonitor.data.repository.StockRepositoryImpl
 import com.stockmonitor.data.repository.StockPoolRepositoryImpl
 import com.stockmonitor.service.StockPriceWorker
 import com.stockmonitor.util.FileLogger
 import com.stockmonitor.data.repository.StockMonitorRepositoryImpl
+import com.stockmonitor.domain.repository.SettingsRepository
 import com.stockmonitor.domain.repository.StockPoolRepository
 import com.stockmonitor.domain.repository.StockRepository
 import com.stockmonitor.domain.repository.StockMonitorRepository
@@ -79,6 +82,15 @@ object AppModule {
     @Singleton
     fun provideStockAlertDao(database: StockDatabase): StockAlertDao {
         return database.stockAlertDao()
+    }
+
+    /**
+     * 提供设置数据访问对象
+     */
+    @Provides
+    @Singleton
+    fun provideSettingsDao(database: StockDatabase): SettingsDao {
+        return database.settingsDao()
     }
 
     /**
@@ -175,5 +187,16 @@ object AppModule {
         fileLogger: FileLogger
     ): StockMonitorRepository {
         return StockMonitorRepositoryImpl(stockDao, stockDataDao, stockAlertDao, stockApiService, fileLogger)
+    }
+
+    /**
+     * 提供设置仓库
+     */
+    @Provides
+    @Singleton
+    fun provideSettingsRepository(
+        settingsDao: SettingsDao
+    ): SettingsRepository {
+        return SettingsRepositoryImpl(settingsDao)
     }
 }

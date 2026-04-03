@@ -2,7 +2,13 @@ package com.stockmonitor.util
 
 import android.content.Context
 import android.content.SharedPreferences
+import android.util.Log
+import androidx.work.ExistingPeriodicWorkPolicy
+import androidx.work.PeriodicWorkRequestBuilder
+import androidx.work.WorkManager
+import com.stockmonitor.service.StockPriceWorker
 import dagger.hilt.android.qualifiers.ApplicationContext
+import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -12,7 +18,7 @@ import javax.inject.Singleton
  */
 @Singleton
 class RefreshStateManager @Inject constructor(
-    @ApplicationContext context: Context
+    @ApplicationContext private val context: Context
 ) {
     private val prefs: SharedPreferences = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
 
@@ -48,5 +54,24 @@ class RefreshStateManager @Inject constructor(
         } else {
             null
         }
+    }
+
+    /**
+     * 重新调度定时任务
+     * @param intervalMinutes 新的执行间隔（分钟）
+     */
+    fun rescheduleWorker(intervalMinutes: Long) {
+        val safeInterval = maxOf(intervalMinutes, 15L)
+        Log.d("RefreshStateManager", "调度定时任务，实际间隔: ${safeInterval}分钟 (请求: ${intervalMinutes}分钟)")
+        val workRequest = PeriodicWorkRequestBuilder<StockPriceWorker>(
+            safeInterval,
+            TimeUnit.MINUTES
+        ).build()
+
+        WorkManager.getInstance(context).enqueueUniquePeriodicWork(
+            StockPriceWorker.WORK_NAME,
+            ExistingPeriodicWorkPolicy.UPDATE,
+            workRequest
+        )
     }
 }
