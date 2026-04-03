@@ -14,11 +14,34 @@ import java.util.Calendar
  */
 object TradingTimeChecker {
     /**
-     * 判断当前时间是否为交易时间
+     * 判断当前时间是否为交易时间（使用默认时间段）
      *
      * @return true 表示当前在交易时间内，false 表示不在交易时间内
      */
     fun isTradingTime(): Boolean {
+        return isTradingTime(
+            morningStartTime = "09:30",
+            morningEndTime = "11:30",
+            afternoonStartTime = "13:00",
+            afternoonEndTime = "15:00"
+        )
+    }
+
+    /**
+     * 判断当前时间是否为交易时间（使用自定义时间段）
+     *
+     * @param morningStartTime 上午开始时间 (HH:mm)
+     * @param morningEndTime 上午结束时间 (HH:mm)
+     * @param afternoonStartTime 下午开始时间 (HH:mm)
+     * @param afternoonEndTime 下午结束时间 (HH:mm)
+     * @return true 表示当前在交易时间内，false 表示不在交易时间内
+     */
+    fun isTradingTime(
+        morningStartTime: String,
+        morningEndTime: String,
+        afternoonStartTime: String,
+        afternoonEndTime: String
+    ): Boolean {
         val calendar = Calendar.getInstance()
         val dayOfWeek = calendar.get(Calendar.DAY_OF_WEEK)
         val hourOfDay = calendar.get(Calendar.HOUR_OF_DAY)
@@ -32,16 +55,24 @@ object TradingTimeChecker {
         // 转换为分钟计数
         val currentMinutes = hourOfDay * 60 + minute
 
-        // 上午盘：9:30 - 11:30 (570-690)
-        val morningStart = 9 * 60 + 30  // 570
-        val morningEnd = 11 * 60 + 30   // 690
-
-        // 下午盘：13:00 - 15:00 (780-900)
-        val afternoonStart = 13 * 60     // 780
-        val afternoonEnd = 15 * 60       // 900
+        // 解析自定义时间段
+        val morningStart = timeToMinutes(morningStartTime)
+        val morningEnd = timeToMinutes(morningEndTime)
+        val afternoonStart = timeToMinutes(afternoonStartTime)
+        val afternoonEnd = timeToMinutes(afternoonEndTime)
 
         return (currentMinutes in morningStart until morningEnd) ||
                 (currentMinutes in afternoonStart until afternoonEnd)
+    }
+
+    /**
+     * 将HH:mm格式的时间转换为分钟数
+     */
+    private fun timeToMinutes(time: String): Int {
+        val parts = time.split(":")
+        val hour = parts.getOrNull(0)?.toIntOrNull() ?: 0
+        val minute = parts.getOrNull(1)?.toIntOrNull() ?: 0
+        return hour * 60 + minute
     }
 
     /**

@@ -8,6 +8,7 @@ import androidx.work.ExistingPeriodicWorkPolicy
 import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
 import com.stockmonitor.data.local.StockDao
+import com.stockmonitor.domain.repository.SettingsRepository
 import com.stockmonitor.domain.repository.StockMonitorRepository
 import com.stockmonitor.domain.usecase.GetMonitoredStocksUseCase
 import com.stockmonitor.service.StockPriceWorker
@@ -36,6 +37,7 @@ class StockMonitorViewModel @Inject constructor(
     private val getMonitoredStocksUseCase: GetMonitoredStocksUseCase,
     private val stockDao: StockDao,
     private val stockMonitorRepository: StockMonitorRepository,
+    private val settingsRepository: SettingsRepository,
     private val refreshStateManager: RefreshStateManager,
     private val refreshEventBus: RefreshEventBus,
     @ApplicationContext private val context: Context
@@ -51,8 +53,15 @@ class StockMonitorViewModel @Inject constructor(
     init {
         loadRefreshState()
         loadMonitoredStocks()
-        scheduleStockPriceWorker()
         observeRefreshEvent()
+        scheduleStockPriceWorkerWithSettings()
+    }
+
+    private fun scheduleStockPriceWorkerWithSettings() {
+        viewModelScope.launch {
+            val settings = settingsRepository.getSettingsWithDefaults()
+            scheduleStockPriceWorkerWithInterval(settings.refreshIntervalMinutes.toLong())
+        }
     }
 
     private fun observeRefreshEvent() {
@@ -147,9 +156,14 @@ class StockMonitorViewModel @Inject constructor(
     }
 
     private fun scheduleStockPriceWorker() {
-        Log.d(TAG, "开始调度定时任务")
+        scheduleStockPriceWorkerWithInterval(StockPriceWorker.REPEAT_INTERVAL_MINUTES)
+    }
+
+    private fun scheduleStockPriceWorkerWithInterval(intervalMinutes: Long) {
+        val safeInterval = maxOf(intervalMinutes, 15L)
+        Log.d(TAG, "开始调度定时任务，间隔: ${safeInterval}分钟 (请求: ${intervalMinutes}分钟)")
         val workRequest = PeriodicWorkRequestBuilder<StockPriceWorker>(
-            StockPriceWorker.REPEAT_INTERVAL_MINUTES,
+            safeInterval,
             TimeUnit.MINUTES
         ).build()
 
@@ -159,5 +173,20 @@ class StockMonitorViewModel @Inject constructor(
             workRequest
         )
         Log.d(TAG, "定时任务调度完成")
+    }
+
+    fun rescheduleWorker(intervalMinutes: Long) {
+        Log.d(TAG, "重新调度定时任务，间隔: ${intervalMinutes}分钟")
+        val workRequest = PeriodicWorkRequestBuilder<StockPriceWorker>(
+            intervalMinutes,
+            TimeUnit.MINUTES
+        ).build()
+
+        WorkManager.getInstance(context).enqueueUniquePeriodicWork(
+            StockPriceWorker.WORK_NAME,
+            ExistingPeriodicWorkPolicy.UPDATE,
+            workRequest
+        )
+        Log.d(TAG, "定时任务重新调度完成")
     }
 }

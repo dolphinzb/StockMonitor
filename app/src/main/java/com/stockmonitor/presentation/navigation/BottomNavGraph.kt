@@ -4,6 +4,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.List
+import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.Icon
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
@@ -20,6 +21,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import com.stockmonitor.presentation.ui.settings.SettingsScreen
 import com.stockmonitor.presentation.ui.stockmonitor.StockMonitorScreen
 import com.stockmonitor.presentation.ui.stockpool.StockPoolScreen
 import com.stockmonitor.util.TradingTimeChecker
@@ -43,6 +45,12 @@ sealed class NavItem(
         title = "股票池",
         icon = Icons.Default.List
     )
+
+    data object Settings : NavItem(
+        route = "settings",
+        title = "设置",
+        icon = Icons.Default.Settings
+    )
 }
 
 /**
@@ -51,7 +59,7 @@ sealed class NavItem(
 @Composable
 fun BottomNavGraph() {
     val navController = rememberNavController()
-    val navItems = listOf(NavItem.StockMonitor, NavItem.StockPool)
+    val navItems = listOf(NavItem.StockMonitor, NavItem.StockPool, NavItem.Settings)
     val isTradingTime = remember { TradingTimeChecker.isTradingTime() }
 
     Scaffold(
@@ -89,6 +97,9 @@ fun BottomNavGraph() {
             }
             composable(NavItem.StockPool.route) {
                 StockPoolScreen()
+            }
+            composable(NavItem.Settings.route) {
+                SettingsScreen()
             }
         }
     }
